@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spec → Scaffold Developer Agent
 
-## Getting Started
+Generate a small, realistic project scaffold from a short feature description. Paste a spec, click Generate, preview the resulting files, and download them as a ZIP.
 
-First, run the development server:
+Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, and the OpenAI API.
+
+## Quick Start
+
+Prerequisites: Node.js 18+ and an OpenAI API key.
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+1. Configure environment
+
+Create `.env.local` in the project root with your OpenAI key:
+
+```bash
+echo "OPENAI_API_KEY=sk-..." > .env.local
+```
+
+1. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000> and paste a short feature spec. Click “Generate Scaffold” to create files, preview them in the UI, and use “Download ZIP” to export.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What It Does
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Backend: The API route `src/app/api/scaffold/route.ts` calls OpenAI with your spec and returns a typed JSON payload containing:
+  - `summary`: brief description of the generated project
+  - `architectureNotes`: high-level guidance and rationale
+  - `files[]`: an array of `{ path, description, content }`
+- Frontend: `src/app/page.tsx` lets you:
+  - Enter a feature spec and trigger generation
+  - Browse the file list and preview contents
+  - Download everything as `scaffold.zip` via `DownloadZipButton`
 
-## Learn More
+## Configuration
 
-To learn more about Next.js, take a look at the following resources:
+- Model: Set in `src/app/api/scaffold/route.ts` (default: `gpt-4o-mini`).
+- Runtime: The route uses the Edge runtime by default. If you prefer Node.js (e.g., for local mocking), change `export const runtime = "edge";` to `"nodejs"`.
+- Tailwind CSS v4: Enabled by `@tailwindcss/postcss` (see `postcss.config.mjs`). The global CSS imports Tailwind via `@import "tailwindcss";` in `src/app/globals.css`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev     # Start dev server (http://localhost:3000)
+npm run build   # Production build
+npm run start   # Start production server
+npm run lint    # Lint the project
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set `OPENAI_API_KEY` in your hosting environment (e.g., Vercel Project Settings → Environment Variables). Deploy the app, then visit the URL to use the generator.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes & Troubleshooting
+
+- Costs and privacy: Requests are sent to OpenAI using your API key; usage is billed to your account. Do not commit API keys.
+- Tailwind classes not applying? Ensure `src/app/globals.css` includes `@import "tailwindcss";` and rebuild.
+- Large outputs: For very big scaffolds, the UI shows a preview and lets you download the ZIP to inspect locally.
